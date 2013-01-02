@@ -4,6 +4,7 @@ form_experiment
 learning to code a drupal module
 
 Note: Currently, the table described below needs to exist or the module will crash
+Note: The files need to be placed into a folder called 'form_experiment' in the Sites/All/Modules directory
 
 CREATE TABLE `formtestsave` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
