@@ -1,0 +1,183 @@
+<?php
+/**
+ * @file
+ * A block module that displays recent blog and forum posts.
+ */
+
+/** 
+ * Implements hook_help
+ *
+ * Displays help and module informaiton.
+ *
+ * @param path
+ *    which path of the site we're using to display help
+ * @param arg
+ *    Array that holds the current path as returned from arg() function
+ */
+function form_experiment_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#form_experiment":
+    return '<p>' . t("Playing around with the forms API") . '</p>';
+    break;
+  }
+}
+/**
+ * Implements hook menu
+ */
+function form_experiment_menu() {
+  $items = array();
+  $items['my-first-form'] = array(
+    'title' => 'My first form, yay!!',
+    'page callback' => 'form_experiment_form',
+    'access arguments' => array('access content'),
+    'description' => t('Form Test'),
+    'type' => MENU_NORMAL_ITEM,
+    'menu_name' => 'main-menu',
+    'weight' => 0,
+  );
+  $items['turd-punch'] = array(
+    'title' => 'There is a turd in the punch bowl',
+    'page callback' => 'form_experiment_form',
+    'access arguments' => array('access content'),
+    'description' => t('A silly thing about a turd'),
+    'type' => MENU_NORMAL_ITEM,
+    'menu_name' => 'main-menu',
+    'weight' => 0,
+  );
+  return $items;  
+}
+function form_experiment_form () {
+
+  return drupal_get_form('form_experiment_test_form'); // the form builder function is called
+
+}
+/**
+ * The form builder function
+ */
+function form_experiment_test_form($form_state) {
+    
+  $form['name']['first'] = array(
+    '#type' => 'textfield',
+    '#title' => t('First Name'),
+    '#description' => 'Please enter your first name',
+    '#required' => TRUE,
+  );
+  $form['name']['middle'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Middle Initial'),
+    '#description' => 'Please enter the first letter of your middle name',
+    '#maxlength' => 1,
+  );
+  $form['name']['last'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Last Name'),
+    '#description' => 'Please enter your last name',
+    '#required' => TRUE,
+  );
+  $form['year_of_birth'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Year of Birth',
+    '#description' => t('Enter your year of birth'),
+    '#required' => TRUE,
+  );
+  $form['computer'] = array(
+    '#title' => t('Do you own a computer?'),
+    '#type' => 'radios',
+    '#options' => array('yes' => t('Yes'),'no' => t('No')),
+    '#required' => TRUE,
+  );
+  $form['comment'] = array(
+    '#title' => t('Please add any additional comments.'),
+    '#type' => 'textarea',
+    '#required' => TRUE,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  //echo "<pre>";
+    //print_r($form);
+  //echo "</pre>";
+
+  return $form;
+}
+function form_experiment_test_form_validate($form, &$form_state) {
+  
+  $year_of_birth = $form_state['values']['year_of_birth'];
+  
+  if ($year_of_birth && ($year_of_birth < 1900 || $year_of_birth > 2000)) {
+    form_set_error('year_of_birth', 'Enter a year between 1900 and 2000');
+  }
+  
+  $middle_initial = $form_state['values']['middle'];
+  
+  if ($middle_initial == 'Z') {
+    form_set_error('middle', 'Cannot Use J. Try something else.');
+  }
+
+}
+function form_experiment_test_form_submit($form, &$form_state) {
+
+  $return_value = NULL;
+  try {
+  $return_value = db_insert('formtestsave')
+    ->fields(array(
+        'first_name'      => $form_state['values']['first'],
+        'last_name'       => $form_state['values']['last'],
+        'middle_inital'   => $form_state['values']['middle'],
+        'year_of_birth'   => $form_state['values']['year_of_birth'],
+        'computer'        => $form_state['values']['computer'],
+        'comment'         => $form_state['values']['comment']
+      ))
+    ->execute();
+    drupal_set_message(t('Thank you @first. The form has been submitted.',array('@first' => $form_state['values']['first'])));
+  } catch (Exception $e) {
+    drupal_set_message(t('db_insert failed. Message = %message, query= %query', array('%message' => $e->getMessage(), '%query' => $e->query_string)), 'error');
+  }
+  // test
+    //include('node_create.inc');
+    //createNodeProgrammatically();
+  // /end test
+} 
+function form_experiment_block_info() {
+  
+  $block['form_experiment'] = array (
+    'info' => t('Form Experiment'), //The name that will appear in the block list.
+    'cache' => DRUPAL_NO_CACHE, //Default
+  );
+  return $block;
+
+}
+function form_experiment_contents() {
+  $query = db_select('formtestsave')
+    ->fields('formtestsave', array('id','first_name','middle_inital','last_name','comment'))
+    ->orderBy('id', 'DESC')
+    //->range(0,5)
+    ;
+  return $query->execute();
+}
+/**
+ * Implements hook_block_view
+ */
+function form_experiment_block_view($delta = '') {
+  
+  $result = form_experiment_contents(); 
+
+  $items = array();
+
+  foreach ($result as $node) {
+    $items[] = array(
+      'data' => '<p>' . $node->first_name . ' ' . $node->middle_inital . ' ' . $node->last_name
+      . '<br>' . '<b>' . $node->comment . '</b></p>'
+    );
+  }
+
+  $block = array();
+  $block['subject'] = t('Form Experiment');
+  $block['content']['posts'] = array(
+    '#theme' => 'item_list__form_experiment__block',
+    '#items' => $items,
+  );
+  return $block;
+  
+}

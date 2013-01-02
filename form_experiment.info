@@ -1,0 +1,5 @@
+name = Form Experiment
+description = A module to teach myself the form API
+core = 7.x
+
+configure = admin/config/content/form_experiment
