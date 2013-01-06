@@ -1,0 +1,50 @@
+<?php
+
+function form_experiment_schema() {
+  $schema['formtestsave2'] = array(
+    'fields' => array(
+      'fid' => array(
+        'description' => 'The primary key',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'first_name' => array(
+        'description' => 'First Name',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'last_name' => array(
+        'description' => 'Last Name',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'middle_inital' => array(
+        'description' => 'Middle Initial',
+        'type' => 'text',
+        'size' => 'tiny',
+        'not null' => FALSE,
+      ),
+      'year_of_birth' => array(
+        'description' => 'Year of Birth YYYY',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+      ),
+      'computer' => array(
+        'description' => 'Own a computer? Yes or No',
+        'type' => 'text',
+        'size' => 'tiny',
+        'not null' => FALSE,
+      ),
+      'comment' => array(
+        'description' => 'The comment body',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('fid'),
+  );
+  return $schema;
+}

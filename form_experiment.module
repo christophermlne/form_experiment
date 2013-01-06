@@ -120,7 +120,7 @@ function form_experiment_test_form_submit($form, &$form_state) {
 
   $return_value = NULL;
   try {
-  $return_value = db_insert('formtestsave')
+  $return_value = db_insert('formtestsave2')
     ->fields(array(
         'first_name'      => $form_state['values']['first'],
         'last_name'       => $form_state['values']['last'],
@@ -149,9 +149,9 @@ function form_experiment_block_info() {
 
 }
 function form_experiment_contents() {
-  $query = db_select('formtestsave')
-    ->fields('formtestsave', array('id','first_name','middle_inital','last_name','comment'))
-    ->orderBy('id', 'DESC')
+  $query = db_select('formtestsave2')
+    ->fields('formtestsave2', array('fid','first_name','middle_inital','last_name','comment'))
+    ->orderBy('fid', 'DESC')
     //->range(0,5)
     ;
   return $query->execute();
@@ -181,3 +181,24 @@ function form_experiment_block_view($delta = '') {
   return $block;
   
 }
+/**
+ * Implements hook_entity_info().
+ *
+ * This is the fundamental description of the entity.
+ *
+ * It provides a single entity with a single bundle and without revision
+ * support.
+ */
+/* // Disabled while troubleshooting white screen of death EDIT: this seems to be the culprit
+function form_experiment_entity_info() {
+  echo get_defined_vars();
+  try {
+    $info['form_experiment_entity_basic'] = array(
+
+    );  
+  } catch (Exception $e) {
+    
+  }
+  
+  return $info;
+}*/ 
