@@ -3,16 +3,6 @@ form_experiment
 
 learning to code a drupal module
 
-Note: Currently, the table described below needs to exist or the module will crash
-Note: The files need to be placed into a folder called 'form_experiment' in the Sites/All/Modules directory
-
-CREATE TABLE `formtestsave` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `first_name` text,
-  `last_name` text,
-  `middle_inital` tinytext,
-  `year_of_birth` int(4) DEFAULT NULL,
-  `computer` text,
-  `comment` longtext,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;
+update:
+- used hook_schema in the .install file to define a table that is created automatically when the module is enabled, and destroyed when the module is uninstalled
+- disabling the module will leave the data intact. uninstalling will destroy it.
